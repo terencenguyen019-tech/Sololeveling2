@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHADOW SYSTEM - MONARCH RANK</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#001f3f">
+    <link rel="apple-touch-icon" href="icon.PNG">
+
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* --- GIAO DIỆN SHADOW MONARCH --- */
+        :root {
+            --bg-dark: #050810;
+            --panel-bg: linear-gradient(160deg, #0b121e 0%, #120c1f 100%);
+            --aura-glow: #00a8ff;        
+            --shadow-purple: #9d4edd;
+            --text-glow: #e0e6ff;
+            --danger: #ff3333;
+            --warning: #ffcc00;
+            --success: #00ff00;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-glow);
+            font-family: 'Roboto Condensed', sans-serif;
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), url('https://i.pinimg.com/originals/2a/12/35/2a1235476602353195253531353531.jpg');
+            background-size: cover; background-attachment: fixed; background-position: center;
+        }
+
+        .system-window {
+            width: 100%; max-width: 500px;
+            background: var(--panel-bg);
+            border-radius: 8px; overflow: hidden; position: relative;
+            box-shadow: 0 0 20px var(--aura-glow);
+            animation: slideDown 0.8s ease-out, shadowPulse 4s infinite alternate;
+        }
+
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shadowPulse { 
+            0% { box-shadow: 0 0 20px var(--aura-glow); border: 1px solid var(--aura-glow); } 
+            100% { box-shadow: 0 0 40px var(--shadow-purple); border: 1px solid var(--shadow-purple); } 
+        }
+
+        .header { background: linear-gradient(90deg, transparent, rgba(0, 86, 179, 0.3), transparent); padding: 20px; text-align: center; border-bottom: 1px solid rgba(0, 168, 255, 0.3); }
+        .quest-title { color: #fff; font-family: 'Oswald', sans-serif; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px; margin: 0; text-shadow: 0 0 15px var(--aura-glow); }
+        .sub-title { font-size: 0.9rem; color: var(--aura-glow); letter-spacing: 1px; margin-top: 5px; }
+
+        .rank-display { text-align: center; padding: 15px; background: rgba(0,0,0,0.6); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .rank-text { font-size: 1.5rem; color: var(--warning); font-weight: bold; text-shadow: 0 0 10px var(--warning); }
+        
+        .content { padding: 20px; max-height: 75vh; overflow-y: auto; }
+        
+        /* PHÂN CÁCH MỤC */
+        .section-title {
+            color: var(--aura-glow); border-left: 4px solid var(--shadow-purple); padding-left: 10px; 
+            margin: 25px 0 15px 0; font-size: 1.1rem; text-transform: uppercase; font-weight: bold;
+            background: linear-gradient(90deg, rgba(0, 86, 179, 0.1), transparent);
+        }
+
+        /* TASK ITEM */
+        .task-item {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 12px;
+            background: rgba(10, 10, 30, 0.6); border: 1px solid rgba(0, 86, 179, 0.3); border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .task-item:hover { background: rgba(0, 168, 255, 0.15); border-color: var(--aura-glow); }
+
+        .gym-list label { display: block; margin-bottom: 8px; cursor: pointer; }
+        .gym-list input { margin-right: 10px; transform: scale(1.2); }
+
+        button {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--aura-glow); color: var(--aura-glow);
+            padding: 5px 12px; cursor: pointer; font-family: 'Roboto Condensed', sans-serif; font-weight: bold; border-radius: 4px;
+            text-transform: uppercase; font-size: 0.85rem;
+        }
+        button:active { background: var(--aura-glow); color: #fff; }
+        .btn-check.completed { background: var(--shadow-purple); border-color: var(--shadow-purple); color: #fff; pointer-events: none; }
+
+        .progress-text { font-family: monospace; color: #888; }
+        .completed-text { color: var(--success); text-shadow: 0 0 5px var(--success); }
+
+        /* KHU VỰC AI (ĐẸP) */
+        .ai-hub {
+            background: rgba(0, 0, 0, 0.7); border: 1px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 25px;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.1);
+        }
+        .upload-zone {
+            border: 2px dashed var(--aura-glow); padding: 20px; text-align: center; margin-top: 15px; cursor: pointer; position: relative;
+        }
+        .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 10px; }
+        .preview-img { width: 100%; height: 60px; object-fit: cover; border: 1px solid #fff; border-radius: 4px; }
+
+        .analyze-btn {
+            width: 100%; padding: 12px; margin-top: 15px; border: none; color: #000; font-weight: bold; font-size: 1rem;
+            background: linear-gradient(90deg, var(--warning), #ffaa00);
+            box-shadow: 0 0 10px var(--warning); cursor: pointer;
+        }
+        .analyze-btn:disabled { background: #333; color: #555; box-shadow: none; cursor: not-allowed; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; overflow-y: auto;}
+        .modal-content { margin: 5% auto; width: 90%; max-width: 500px; background: #0b121e; border: 2px solid var(--shadow-purple); padding: 20px; border-radius: 10px; }
+        .result-text { color: #e0e6ff; line-height: 1.6; text-align: left; margin-top: 15px; font-size: 0.95rem; }
+        .result-text strong { color: var(--warning); }
+        .loading-spinner { border: 4px solid #333; border-top: 4px solid var(--aura-glow); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+<div class="system-window">
+    <div class="header">
+        <h1 class="quest-title">SHADOW SYSTEM</h1>
+        <div class="sub-title">TRẠNG THÁI: <span id="conn-status" style="color:yellow">ĐANG ĐỒNG BỘ...</span></div>
+    </div>
+
+    <div class="rank-display">
+        <div id="current-rank" class="rank-text">[RANK F]</div>
+        <div style="font-size: 0.85rem; color: #aaa;">Ngày thứ: <span id="day-streak" style="color:#fff">1</span></div>
+    </div>
+
+    <div class="content">
+        <div class="section-title">⚡ QUÉT CƠ THỂ (GEMINI AI)</div>
+        <div class="ai-hub">
+            <div id="ai-upload-area" style="display:none;">
+                <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <div id="upload-label" style="color:#aaa; font-weight:bold;">CHỌN 3 ẢNH ĐỂ PHÂN TÍCH</div>
+                    <input type="file" id="file-input" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+                </div>
+                <div id="preview-grid" class="preview-grid"></div>
+                <button id="analyze-btn" class="analyze-btn" onclick="analyzeBody()" disabled>PHÂN TÍCH NGAY</button>
+            </div>
+            
+            <div id="ai-locked-msg" style="text-align:center; color:#888; padding:10px;">
+                Cổng AI sẽ mở vào Ngày 3, 6, 9...<br>(Hãy lưu ảnh trong máy mỗi ngày)
+            </div>
+        </div>
+
+        <div class="section-title">I. DINH DƯỠNG</div>
+        <div class="task-item">
+            <span>Uống Nước (6L)</span>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span id="water-val" class="progress-text">0.0</span>
+                <button onclick="addWater()">+0.5</button>
+            </div>
+        </div>
+        <div class="task-item">
+            <span>Uống Sữa (1L)</span>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span id="milk-val" class="progress-text">0.0</span>
+                <button onclick="addMilk()">+0.2</button>
+            </div>
+        </div>
+        <div class="task-item">
+            <span>Thực phẩm chức năng</span>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span id="supp-val" class="progress-text">0/2</span>
+                <button onclick="addSupp()">NẠP</button>
+            </div>
+        </div>
+        <div class="task-item">
+            <span>Nước ép Cà rốt</span>
+            <button id="btn-carrot" onclick="toggleTask('carrot')">THỰC HIỆN</button>
+        </div>
+
+        <div class="section-title">II. RÈN LUYỆN THỂ CHẤT</div>
+        <div class="task-item" style="flex-direction:column; align-items:flex-start;">
+            <div style="font-weight:bold; color:var(--aura-glow); margin-bottom:10px;">LỊCH TRÌNH GYM (3 Tập - 1 Nghỉ)</div>
+            <div class="gym-list" style="width:100%;">
+                <label><input type="checkbox" onchange="checkGym()" class="gym-check"> 50 Bicep Curls (Tay trước)</label>
+                <label><input type="checkbox" onchange="checkGym()" class="gym-check"> 25 Tricep Extensions (Tay sau)</label>
+                <label><input type="checkbox" onchange="checkGym()" class="gym-check"> 50 Squats (Chân)</label>
+                <label><input type="checkbox" onchange="checkGym()" class="gym-check"> 25 Incline Press (Ngực trên)</label>
+                <label><input type="checkbox" onchange="checkGym()" class="gym-check"> 25 Walking Lunges (Đùi)</label>
+            </div>
+            <div id="gym-status" style="width:100%; text-align:right; font-size:0.8rem; color:#666; margin-top:5px;">CHƯA HOÀN THÀNH</div>
+        </div>
+        <div class="task-item">
+            <span>Đạp xe mỗi ngày</span>
+            <button id="btn-bike" onclick="toggleTask('bike')">THỰC HIỆN</button>
+        </div>
+        <div class="task-item">
+            <span>Chạy nước rút (T2,4,CN)</span>
+            <button id="btn-sprint" onclick="toggleTask('sprint')">THỰC HIỆN</button>
+        </div>
+
+        <div class="section-title">III. NGOẠI HÌNH</div>
+        <div class="task-item">
+            <span>Skincare (2 lần)</span>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span id="skin-val" class="progress-text">0/2</span>
+                <button onclick="addSkin()">XONG</button>
+            </div>
+        </div>
+        <div class="task-item">
+            <span>Jawline & Mũi (3 lần)</span>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span id="jaw-val" class="progress-text">0/3</span>
+                <button onclick="addJaw()">TẬP</button>
+            </div>
+        </div>
+        <div class="task-item">
+            <span>Mewing (Giữ lưỡi)</span>
+            <button id="btn-mewing" onclick="toggleTask('mewing')">THỰC HIỆN</button>
+        </div>
+
+        <div class="section-title">IV. TRI THỨC</div>
+        <div class="task-item">
+            <span>Học Tiếng Nhật</span>
+            <button id="btn-jp" onclick="toggleTask('jp')">THỰC HIỆN</button>
+        </div>
+        <div class="task-item">
+            <span>Học Phổ Thông</span>
+            <button id="btn-school" onclick="toggleTask('school')">THỰC HIỆN</button>
+        </div>
+
+        <button onclick="finishDay()" style="width:100%; margin-top:20px; padding:15px; border-color:var(--warning); color:var(--warning); font-size:1rem;">KẾT THÚC NGÀY</button>
+    </div>
+</div>
+
+<div id="result-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="color:var(--aura-glow); text-align:center; margin:0;">PHÂN TÍCH TỪ GEMINI</h2>
+        <div id="loading" class="loading-spinner"></div>
+        <div id="ai-result" class="result-text"></div>
+        <button onclick="document.getElementById('result-modal').style.display='none'" style="width:100%; margin-top:20px; background:var(--warning); color:#000; padding:10px; border:none; font-weight:bold;">ĐÓNG</button>
+    </div>
+</div>
+
+<script>
+    // --- 1. CẤU HÌNH HỆ THỐNG ---
+    const API_KEY = "AIzaSyCDhUma7iFyWZRZ98-LqdFa5bIJNrciJf0"; // Đã tích hợp sẵn
+    
+    const ranks = [
+        { day: 0, title: "Kẻ Vô Danh" }, { day: 3, title: "[Rank F] Kẻ Mới Thức Tỉnh" }, { day: 7, title: "[Rank E] Tân Binh" },
+        { day: 14, title: "[Rank D] Chiến Binh" }, { day: 28, title: "[Rank C] Hiệp Sĩ" }, { day: 42, title: "[Rank B] Thợ Săn" },
+        { day: 60, title: "[Rank A] Đạo Sư" }, { day: 100, title: "[Rank S] Hoàng Đế Bóng Tối" }
+    ];
+
+    let data = JSON.parse(localStorage.getItem('soloLevelingFull')) || {
+        day: 1, water: 0, milk: 0, supp: 0, skin: 0, jaw: 0,
+        tasks: {}, gymDone: false
+    };
+
+    let selectedFiles = [];
+
+    // --- 2. KHỞI TẠO ---
+    function init() {
+        document.getElementById('day-streak').innerText = data.day;
+        
+        // Tính Rank
+        let rTitle = ranks[0].title;
+        for(let r of ranks) { if(data.day >= r.day) rTitle = r.title; }
+        document.getElementById('current-rank').innerText = rTitle;
+
+        // Cập nhật số liệu
+        document.getElementById('water-val').innerText = data.water.toFixed(1) + "/6";
+        document.getElementById('milk-val').innerText = data.milk.toFixed(1) + "/1";
+        document.getElementById('supp-val').innerText = data.supp + "/2";
+        document.getElementById('skin-val').innerText = data.skin + "/2";
+        document.getElementById('jaw-val').innerText = data.jaw + "/3";
+
+        // Cập nhật nút
+        updateBtn('btn-carrot', 'carrot');
+        updateBtn('btn-bike', 'bike');
+        updateBtn('btn-sprint', 'sprint');
+        updateBtn('btn-mewing', 'mewing');
+        updateBtn('btn-jp', 'jp');
+        updateBtn('btn-school', 'school');
+
+        // Reset gym check (Chỉ mang tính hiển thị hàng ngày)
+        if(data.gymDone) {
+            document.getElementById('gym-status').innerText = "ĐÃ HOÀN THÀNH";
+            document.getElementById('gym-status').style.color = "#00ff00";
+        }
+
+        // MỞ CỔNG AI (Chỉ ngày 3, 6, 9... HOẶC MỞ LUÔN ĐỂ BẠN TEST)
+        // Hiện tại tôi để mở luôn ngày 1 để bạn test. Nếu muốn đúng luật thì sửa (data.day % 3 === 0)
+        if(true) { 
+            document.getElementById('ai-upload-area').style.display = 'block';
+            document.getElementById('ai-locked-msg').style.display = 'none';
+        }
+
+        testConnection();
+    }
+
+    function updateBtn(id, key) {
+        const btn = document.getElementById(id);
+        if(data.tasks[key]) {
+            btn.classList.add('completed');
+            btn.innerText = "ĐÃ XONG";
+        } else {
+            btn.classList.remove('completed');
+            btn.innerText = "THỰC HIỆN";
+        }
+    }
+
+    // --- 3. LOGIC CLICK ---
+    function addWater() { if(data.water < 6) { data.water += 0.5; save(); } }
+    function addMilk() { if(data.milk < 1) { data.milk += 0.2; save(); } }
+    function addSupp() { if(data.supp < 2) { data.supp++; save(); } }
+    function addSkin() { if(data.skin < 2) { data.skin++; save(); } }
+    function addJaw() { if(data.jaw < 3) { data.jaw++; save(); } }
+    function toggleTask(k) { data.tasks[k] = !data.tasks[k]; save(); }
+
+    function checkGym() {
+        const checks = document.querySelectorAll('.gym-check:checked').length;
+        if(checks === 5) {
+            data.gymDone = true;
+            document.getElementById('gym-status').innerText = "ĐÃ HOÀN THÀNH";
+            document.getElementById('gym-status').style.color = "#00ff00";
+        } else {
+            data.gymDone = false;
+            document.getElementById('gym-status').innerText = checks + "/5 Bài";
+            document.getElementById('gym-status').style.color = "#666";
+        }
+        save();
+    }
+
+    function save() {
+        localStorage.setItem('soloLevelingFull', JSON.stringify(data));
+        init();
+    }
+
+    function finishDay() {
+        data.day++;
+        data.water = 0; data.milk = 0; data.supp = 0; data.skin = 0; data.jaw = 0;
+        data.tasks = {}; data.gymDone = false;
+        
+        // Reset checkbox
+        document.querySelectorAll('.gym-check').forEach(el => el.checked = false);
+        
+        save();
+        alert("Đã chuyển sang Ngày " + data.day);
+        location.reload();
+    }
+
+    // --- 4. TRÍ TUỆ NHÂN TẠO (GEMINI) ---
+    async function testConnection() {
+        const el = document.getElementById('conn-status');
+        try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key=${API_KEY}`);
+            if(res.ok) {
+                el.innerText = "ONLINE";
+                el.style.color = "#00ff00";
+            } else {
+                el.innerText = "LỖI KEY";
+                el.style.color = "red";
+            }
+        } catch(e) {
+            el.innerText = "OFFLINE"; // Sẽ xảy ra nếu chạy trên máy tính
+        }
+    }
+
+    function handleFiles(files) {
+        const grid = document.getElementById('preview-grid');
+        grid.innerHTML = "";
+        selectedFiles = Array.from(files).slice(0, 3);
+        
+        selectedFiles.forEach(file => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = 'preview-img';
+            grid.appendChild(img);
+        });
+
+        if(selectedFiles.length > 0) {
+            const btn = document.getElementById('analyze-btn');
+            btn.disabled = false;
+            document.getElementById('upload-label').innerText = `ĐÃ CHỌN ${selectedFiles.length} ẢNH`;
+        }
+    }
+
+    async function analyzeBody() {
+        const btn = document.getElementById('analyze-btn');
+        const modal = document.getElementById('result-modal');
+        const box = document.getElementById('ai-result');
+        const loading = document.getElementById('loading');
+
+        btn.disabled = true;
+        modal.style.display = 'block';
+        loading.style.display = 'block';
+        box.innerHTML = "";
+
+        try {
+            // Convert ảnh
+            const imagePromises = selectedFiles.map(file => new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve({
+                    inlineData: { data: reader.result.split(',')[1], mimeType: file.type }
+                });
+                reader.readAsDataURL(file);
+            }));
+            const imageParts = await Promise.all(imagePromises);
+
+            // Gửi lên Google
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: "Đóng vai hệ thống Solo Leveling. Phân tích body check trong ảnh. Nhận xét cơ bắp/mỡ. So sánh thay đổi. Đưa ra lời khuyên ngắn gọn, gắt gao. Format Markdown." },
+                            ...imageParts
+                        ]
+                    }],
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                    ]
+                })
+            });
+
+            const json = await res.json();
+            loading.style.display = 'none';
+
+            if(json.candidates && json.candidates[0].content) {
+                const text = json.candidates[0].content.parts[0].text;
+                box.innerHTML = marked.parse(text);
+                btn.innerText = "PHÂN TÍCH XONG";
+            } else {
+                box.innerText = "Lỗi: AI không phản hồi (Có thể do ảnh hoặc lỗi mạng).";
+            }
+            btn.disabled = false;
+
+        } catch(e) {
+            loading.style.display = 'none';
+            box.innerText = "Lỗi nghiêm trọng: " + e.message;
+            btn.disabled = false;
+        }
+    }
+
+    // PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+
+    init();
+    // Clear checkbox lúc load để tránh lỗi hiển thị
+    document.querySelectorAll('.gym-check').forEach(el => el.checked = false);
+
+</script>
+
+</body>
+</html>
